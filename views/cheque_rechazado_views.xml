@@ -79,6 +79,6 @@
             name="Cheques rechazados"
             action="action_cheque_rechazado"
             parent="account.menu_finance_receivables"
-            sequence="10" groups="account.group_account_invoice"/>
+            sequence="300" groups="account.group_account_invoice"/>
     </data>
 </odoo>
