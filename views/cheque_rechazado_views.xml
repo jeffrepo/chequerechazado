@@ -23,11 +23,14 @@
                                 <field name="fecha" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
                                 <field name="banco_id" domain="[('type', '=', 'bank')]" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
                                 <field name="cuenta_cobrar_id" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
+                                <field name="numero_deposito" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
                                 <field name="monto" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
                             </group>
                             <group>
-                                <field name="numero_deposito" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
+                                <field name="fecha_recuperar"/>
+                                <field name="banco_recuperar_id" domain="[('type', '=', 'bank')]"/>
                                 <field name="numero_cheque" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
+                                <field name="banco_cheque"/>
                                 <field name="motivo_rechazo" attrs="{'readonly':[('estado','in',['cobrar','recuperado'])]}"/>
                                 <field name="asiento_ids" readonly="True" widget="many2many_tags"/>
                             </group>

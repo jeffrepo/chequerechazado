@@ -8,12 +8,12 @@ class ChequeRechazado(models.Model):
     _rec_name = 'cliente_id'
 
     cliente_id = fields.Many2one('res.partner','Cliente', required = True)
-    banco_id = fields.Many2one('account.journal','Banco', required = True)
+    banco_id = fields.Many2one('account.journal','Banco por cobrar', required = True)
     cuenta_cobrar_id = fields.Many2one('account.account','Cuenta a cobrar')
     numero_deposito = fields.Char('Número de depósito')
     numero_cheque = fields.Char('Número de cheque')
     motivo_rechazo = fields.Char('Motivo rechazo')
-    fecha = fields.Date('Fecha')
+    fecha = fields.Date('Fecha por cobrar')
     monto = fields.Float('Monto')
     estado = fields.Selection([
         ('nuevo', 'Nuevo'),
@@ -21,6 +21,9 @@ class ChequeRechazado(models.Model):
         ('recuperado','Recuperado'),
     ], string='Estado', help='Estado',readonly=True, default='nuevo')
     asiento_ids = fields.Many2many('account.move', string='Asientos')
+    banco_cheque = fields.Char('Banco del cheque')
+    fecha_recuperar = fields.Date('Fecha recuperar')
+    banco_recuperar_id = fields.Many2one('account.journal','Banco recuperar')
 
     def cancelar(self):
         for documento in self:
@@ -51,8 +54,8 @@ class ChequeRechazado(models.Model):
 
     def recuperar(self):
         for documento in self:
-            if documento.cuenta_cobrar_id and documento.banco_id.default_account_id:
-                asiento = {'move_type': 'entry','ref': documento.numero_deposito,'date': documento.fecha,'journal_id': documento.banco_id.id,}
+            if documento.cuenta_cobrar_id and documento.banco_recuperar_id.default_account_id:
+                asiento = {'move_type': 'entry','ref': documento.numero_deposito,'date': documento.fecha_recuperar,'journal_id': documento.banco_recuperar_id.id}
                 asiento_id = self.env['account.move'].create(asiento)
                 if asiento_id:
                     apuntes = []
@@ -60,7 +63,7 @@ class ChequeRechazado(models.Model):
                         'account_id': documento.cuenta_cobrar_id.id,'name': documento.numero_cheque,
                         'partner_id': documento.cliente_id.id,'debit': 0,'credit':documento.monto}))
                     apuntes.append((0,0,{'move_id': asiento_id.id,
-                        'account_id': documento.banco_id.default_account_id.id,'name': documento.numero_cheque,
+                        'account_id': documento.banco_recuperar_id.default_account_id.id,'name': documento.numero_cheque,
                         'partner_id': documento.cliente_id.id,'debit': documento.monto,'credit':0}))
                     asiento_id.write({'line_ids' : apuntes})
                     asiento_id.action_post()
